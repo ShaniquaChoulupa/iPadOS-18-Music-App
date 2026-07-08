@@ -33,6 +33,7 @@
             gap: 25px;
             overflow-y: auto;
             height: 100%;
+            user-select: none;
         }
 
         .sidebar-header {
@@ -72,14 +73,6 @@
             align-items: center;
         }
 
-        .sidebar-section-title::after {
-            content: '›';
-            transform: rotate(90deg);
-            font-size: 18px;
-            color: #c7c7cc;
-            display: inline-block;
-        }
-
         .sidebar-menu {
             list-style: none;
         }
@@ -95,6 +88,7 @@
             cursor: pointer;
             gap: 12px;
             margin-bottom: 2px;
+            transition: background-color 0.1s ease;
         }
 
         .sidebar-item.active {
@@ -103,7 +97,6 @@
             font-weight: 500;
         }
 
-        /* SVG Icon color targeting */
         .sidebar-item .icon {
             width: 22px;
             height: 22px;
@@ -114,13 +107,28 @@
             stroke-linejoin: round;
         }
 
-        /* --- Main Content Area --- */
-        .main-content {
+        /* --- Main Layout Frame --- */
+        .content-container {
             flex: 1;
+            position: relative;
+            height: 100%;
+        }
+
+        /* Views management system */
+        .view-panel {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             padding: 40px;
             overflow-y: auto;
-            position: relative;
-            padding-bottom: 120px; /* Space for floating player */
+            padding-bottom: 120px; 
+        }
+
+        .view-panel.active-view {
+            display: block;
         }
 
         .main-header {
@@ -136,6 +144,12 @@
             letter-spacing: -0.5px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
         .more-options {
             width: 28px;
             height: 28px;
@@ -147,6 +161,39 @@
             color: #ff2d55;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        .action-icon {
+            color: #ff2d55;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Global Shared Search & Subheader Component UI --- */
+        .search-bar-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            background-color: #e3e3e8;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            outline: none;
+        }
+
+        .section-subtitle {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 28px 0 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         /* --- Grid System --- */
@@ -178,6 +225,12 @@
             object-fit: cover;
         }
 
+        .placeholder-art {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e5e5ea 0%, #d1d1d6 100%);
+        }
+
         .track-title {
             font-size: 15px;
             font-weight: 500;
@@ -198,6 +251,157 @@
             margin-top: 2px;
         }
 
+        .text-placeholder-line {
+            height: 14px;
+            background-color: #e5e5ea;
+            border-radius: 4px;
+            margin-top: 6px;
+            width: 75%;
+        }
+        .text-placeholder-line.sub {
+            width: 50%;
+            height: 12px;
+            background-color: #f2f2f7;
+        }
+
+        /* --- Feature Specific Layout Elements --- */
+        /* Search Hub Panels */
+        .search-category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .category-tile {
+            aspect-ratio: 2 / 1;
+            border-radius: 12px;
+            background: #e5e5ea;
+            padding: 16px;
+            display: flex;
+            align-items: flex-end;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Featured Content Horizontal Scrolling Row */
+        .horizontal-scroller {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .horizontal-scroller::-webkit-scrollbar { display: none; }
+
+        .scroller-item-large {
+            min-width: 300px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        .scroller-art-large {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e5ea;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        /* Table Lists Layout (Songs / Rows Style) */
+        .list-table-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alphabet-divider {
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid #e5e5ea;
+            padding: 15px 0 5px 0;
+            margin-bottom: 10px;
+        }
+
+        .table-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f2f2f7;
+        }
+
+        .row-art {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            background-color: #e5e5ea;
+            margin-right: 15px;
+        }
+
+        .row-data-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .row-data-right {
+            color: #8e8e93;
+            font-size: 15px;
+            margin-right: 15px;
+        }
+
+        /* Navigation Drill Down Splits (e.g. Artists Column Views) */
+        .split-view-container {
+            display: flex;
+            height: 100%;
+            margin-top: -20px;
+        }
+        .split-left-list {
+            width: 40%;
+            border-right: 1px solid #e5e5ea;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+        .split-right-details {
+            width: 60%;
+            padding-left: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .artist-row-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .artist-row-item.selected {
+            background-color: #ff2d55;
+            color: white;
+        }
+        .artist-row-item.selected .text-placeholder-line {
+            background-color: rgba(255,255,255,0.4);
+        }
+        .circle-art {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e5e5ea;
+        }
+        .big-circle-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #e5e5ea;
+            margin-bottom: 15px;
+        }
+
         /* --- Floating Now Playing Bar --- */
         .player-bar {
             position: absolute;
@@ -215,7 +419,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
-            z-index: 10;
+            z-index: 100;
         }
 
         .player-info {
@@ -241,6 +445,7 @@
 
         .player-text {
             overflow: hidden;
+            width: 100%;
         }
 
         .player-title {
@@ -298,19 +503,19 @@
 
         <nav>
             <ul class="sidebar-menu">
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-home">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     Home
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-new">
                     <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     New
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-radio">
                     <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
                     Radio
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-search">
                     <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     Search
                 </li>
@@ -320,117 +525,242 @@
         <div>
             <div class="sidebar-section-title">Library</div>
             <ul class="sidebar-menu">
-                <li class="sidebar-item active">
-                    <svg class="icon" style="stroke: #ff2d55;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <li class="sidebar-item active" data-target="view-recently-added">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     Recently Added
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-artists">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="19" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                     Artists
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-albums">
                     <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
                     Albums
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-songs">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="19" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                     Songs
                 </li>
-                <li class="sidebar-item">
+                <li class="sidebar-item" data-target="view-downloaded">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 10 12 15 7 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Downloaded
                 </li>
             </ul>
         </div>
-
-        <div>
-            <div class="sidebar-section-title">Playlists</div>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    All Playlists
-                </li>
-                <li class="sidebar-item">
-                    <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    Favorite Songs
-                </li>
-            </ul>
-        </div>
     </aside>
 
-    <main class="main-content">
-        <header class="main-header">
-            <h1 class="main-title">Recently Added</h1>
-            <div class="more-options">•••</div>
-        </header>
+    <div class="content-container">
 
-        <section class="grid">
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album1.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 1</div>
-                <div class="track-artist">Artist Name 1</div>
+        <div id="view-home" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">Home</h1>
+            </header>
+            <div class="section-subtitle">Top Picks for You</div>
+            <div class="horizontal-scroller">
+                <div class="scroller-item-large"><div class="scroller-art-large" style="background: linear-gradient(135deg, #ff5e62, #ff9966);"></div><div class="text-placeholder-line"></div></div>
+                <div class="scroller-item-large"><div class="scroller-art-large" style="background: linear-gradient(135deg, #00c6ff, #0072ff);"></div><div class="text-placeholder-line"></div></div>
+                <div class="scroller-item-large"><div class="scroller-art-large" style="background: linear-gradient(135deg, #a8ff78, #78ffd6);"></div><div class="text-placeholder-line"></div></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album2.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 2</div>
-                <div class="track-artist">Artist Name 2</div>
+            <div class="section-subtitle">Recently Played</div>
+            <div class="grid">
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album3.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 3</div>
-                <div class="track-artist">Artist Name 3</div>
+        </div>
+
+        <div id="view-new" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">New</h1>
+            </header>
+            <div class="horizontal-scroller">
+                <div class="scroller-item-large" style="min-width: 420px;"><div class="scroller-art-large" style="height: 240px; background: linear-gradient(45deg, #f12711, #f5af19);"></div><div class="text-placeholder-line"></div></div>
+                <div class="scroller-item-large" style="min-width: 420px;"><div class="scroller-art-large" style="height: 240px; background: linear-gradient(45deg, #8a2387, #e94057, #f27121);"></div><div class="text-placeholder-line"></div></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album4.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 4</div>
-                <div class="track-artist">Artist Name 4</div>
+            <div class="section-subtitle">Best New Songs</div>
+            <div class="list-table-container">
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div><div class="text-placeholder-line sub"></div></div></div>
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div><div class="text-placeholder-line sub"></div></div></div>
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div><div class="text-placeholder-line sub"></div></div></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album5.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 5</div>
-                <div class="track-artist">Artist Name 5</div>
+        </div>
+
+        <div id="view-radio" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">Radio</h1>
+            </header>
+            <div class="horizontal-scroller" style="gap: 15px; margin-bottom: 20px;">
+                <div class="row-art" style="width: 75px; height: 75px; border-radius: 12px; flex-shrink:0;"></div>
+                <div class="row-art" style="width: 75px; height: 75px; border-radius: 12px; flex-shrink:0;"></div>
+                <div class="row-art" style="width: 75px; height: 75px; border-radius: 12px; flex-shrink:0;"></div>
+                <div class="row-art" style="width: 75px; height: 75px; border-radius: 12px; flex-shrink:0;"></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album6.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 6</div>
-                <div class="track-artist">Artist Name 6</div>
+            <div class="section-subtitle">On Air Now</div>
+            <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                <div class="card"><div class="artwork-wrapper" style="aspect-ratio: 1.5/1;"><div class="placeholder-art" style="background: #3a3a3c;"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper" style="aspect-ratio: 1.5/1;"><div class="placeholder-art" style="background: #2c2c2e;"></div></div><div class="text-placeholder-line"></div></div>
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album7.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 7</div>
-                <div class="track-artist">Artist Name 7</div>
+        </div>
+
+        <div id="view-search" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">Search</h1>
+            </header>
+            <div class="search-bar-container">
+                <input type="text" class="search-input" placeholder="Artists, Songs, Lyrics, and More">
             </div>
-            <div class="card">
-                <div class="artwork-wrapper">
-                    <img src="album8.jpg" alt="">
-                </div>
-                <div class="track-title">Album Title 8</div>
-                <div class="track-artist">Artist Name 8</div>
+            <div class="search-category-grid">
+                <div class="category-tile" style="background: linear-gradient(135deg, #e65c00, #f9d423);">Summertime</div>
+                <div class="category-tile" style="background: linear-gradient(135deg, #ec008c, #fc6767);">Pop</div>
+                <div class="category-tile" style="background: linear-gradient(135deg, #11998e, #38ef7d);">Dance</div>
+                <div class="category-tile" style="background: linear-gradient(135deg, #4e54c8, #8f94fb);">Hip-Hop</div>
+                <div class="category-tile" style="background: linear-gradient(135deg, #f857a6, #ff5858);">Rock</div>
+                <div class="category-tile" style="background: linear-gradient(135deg, #ffd89b, #19547b);">Country</div>
             </div>
-        </section>
+        </div>
+
+        <div id="view-recently-added" class="view-panel active-view">
+            <header class="main-header">
+                <h1 class="main-title">Recently Added</h1>
+                <div class="more-options">•••</div>
+            </header>
+
+            <section class="grid">
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album1.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 1</div>
+                    <div class="track-artist">Artist Name 1</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album2.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 2</div>
+                    <div class="track-artist">Artist Name 2</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album3.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 3</div>
+                    <div class="track-artist">Artist Name 3</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album4.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 4</div>
+                    <div class="track-artist">Artist Name 4</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album5.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 5</div>
+                    <div class="track-artist">Artist Name 5</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album6.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 6</div>
+                    <div class="track-artist">Artist Name 6</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album7.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 7</div>
+                    <div class="track-artist">Artist Name 7</div>
+                </div>
+                <div class="card">
+                    <div class="artwork-wrapper">
+                        <img src="album8.jpg" alt="">
+                    </div>
+                    <div class="track-title">Album Title 8</div>
+                    <div class="track-artist">Artist Name 8</div>
+                </div>
+            </section>
+        </div>
+
+        <div id="view-artists" class="view-panel">
+            <header class="main-header" style="margin-bottom:10px;">
+                <h1 class="main-title">Artists</h1>
+            </header>
+            <div class="split-view-container">
+                <div class="split-left-list">
+                    <div class="alphabet-divider">A</div>
+                    <div class="artist-row-item selected"><div class="circle-art"></div><div class="text-placeholder-line"></div></div>
+                    <div class="artist-row-item"><div class="circle-art"></div><div class="text-placeholder-line"></div></div>
+                    <div class="alphabet-divider">B</div>
+                    <div class="artist-row-item"><div class="circle-art"></div><div class="text-placeholder-line"></div></div>
+                </div>
+                <div class="split-right-details">
+                    <div class="big-circle-avatar"></div>
+                    <div class="text-placeholder-line" style="width:40%; height:20px; margin-bottom:20px;"></div>
+                    <div style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:25px;">
+                        <div style="background:#f5f5f7; padding:10px 30px; border-radius:8px; color:#ff2d55; font-weight:600;">Play</div>
+                        <div style="background:#f5f5f7; padding:10px 30px; border-radius:8px; color:#ff2d55; font-weight:600;">Shuffle</div>
+                    </div>
+                    <div class="grid" style="width:100%; grid-template-columns: repeat(2, 1fr);">
+                        <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                        <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-albums" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">Albums</h1>
+                <div class="header-actions"><div class="action-icon">Sort</div></div>
+            </header>
+            <div class="search-bar-container"><input type="text" class="search-input" placeholder="Search Albums"></div>
+            <div class="alphabet-divider">A</div>
+            <div class="grid" style="margin-top:15px;">
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+                <div class="card"><div class="artwork-wrapper"><div class="placeholder-art"></div></div><div class="text-placeholder-line"></div></div>
+            </div>
+        </div>
+
+        <div id="view-songs" class="view-panel">
+            <header class="main-header">
+                <h1 class="main-title">Songs</h1>
+            </header>
+            <div class="search-bar-container"><input type="text" class="search-input" placeholder="Search Songs"></div>
+            <div class="list-table-container">
+                <div class="alphabet-divider">A</div>
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div></div><div class="row-data-right">3:14</div></div>
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div></div><div class="row-data-right">2:45</div></div>
+                <div class="alphabet-divider">B</div>
+                <div class="table-row"><div class="row-art"></div><div class="row-data-main"><div class="text-placeholder-line"></div></div><div class="row-data-right">4:02</div></div>
+            </div>
+        </div>
+
+        <div id="view-downloaded" class="view-panel">
+            <header class="main-header" style="justify-content: center;">
+                <h1 class="main-title" style="font-size: 17px; font-weight:600;">Downloaded</h1>
+            </header>
+            <div class="list-table-container" style="margin-top:20px;">
+                <div class="table-row" style="padding:16px 0; justify-content:space-between;"><span style="font-size:18px;">Playlists</span><span style="color:#c7c7cc;">›</span></div>
+                <div class="table-row" style="padding:16px 0; justify-content:space-between;"><span style="font-size:18px;">Artists</span><span style="color:#c7c7cc;">›</span></div>
+                <div class="table-row" style="padding:16px 0; justify-content:space-between;"><span style="font-size:18px;">Albums</span><span style="color:#c7c7cc;">›</span></div>
+                <div class="table-row" style="padding:16px 0; justify-content:space-between;"><span style="font-size:18px;">Songs</span><span style="color:#c7c7cc;">›</span></div>
+            </div>
+        </div>
 
         <div class="player-bar">
             <div class="player-info">
                 <div class="player-art">
-                    <img src="current_playing.jpg" alt="">
+                    <img src="library.jpg" alt="">
                 </div>
                 <div class="player-text">
-                    <div class="player-title">Now Playing Title</div>
-                    <div class="player-artist">Now Playing Artist</div>
+                    <div class="player-title">Boom, Boom, Boom, Boom!!</div>
+                    <div class="player-artist">Vengaboys</div>
                 </div>
             </div>
             
@@ -452,8 +782,35 @@
                 </button>
             </div>
             
-            <div style="width: 30%;"></div> </div>
-    </main>
+            <div style="width: 30%;"></div>
+        </div>
+    </div>
 
+    <script>
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const targetViewId = item.getAttribute('data-target');
+                if (!targetViewId) return;
+
+                // 1. Clear current active styling state in navigation column
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                
+                // 2. Clear visible display layout states from main terminal sections
+                document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active-view'));
+
+                // 3. Inject new active state properties dynamically
+                item.classList.add('active');
+                document.getElementById(targetViewId).classList.add('active-view');
+            });
+        });
+
+        // Toggle simple selection decoration on internal layout test arrays
+        document.querySelectorAll('.artist-row-item').forEach(artist => {
+            artist.addEventListener('click', () => {
+                document.querySelectorAll('.artist-row-item').forEach(a => a.classList.remove('selected'));
+                artist.classList.add('selected');
+            });
+        });
+    </script>
 </body>
 </html>
