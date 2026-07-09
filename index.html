@@ -494,19 +494,48 @@
             margin-bottom: 30px;
         }
 
-        .fs-progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
+        /* --- Custom Draggable Scrub/Range Bar Slider Styles --- */
+        .fs-scrub-wrapper {
             position: relative;
+            width: 100%;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
         }
 
-        .fs-progress-fill {
-            width: 0%;
-            height: 100%;
-            background: white;
+        .fs-progress-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Draggable circular thumb control mechanism */
+        .fs-progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .fs-progress-slider:active::-webkit-slider-thumb {
+            transform: scale(2.2);
+        }
+
+        /* Track alignment fallback styling constraints */
+        .fs-progress-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
             border-radius: 2px;
         }
 
@@ -516,6 +545,7 @@
             width: 100%;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.5);
+            font-variant-numeric: tabular-nums;
         }
 
         .fs-controls-row {
@@ -599,10 +629,10 @@
                     <div class="track-title">Ulterior Motives</div>
                     <div class="track-artist">Who's Who</div>
                 </div>
-                <div class="card" data-album="Sweet Boy" data-artist="Malcolm Todd" data-genre="Alternative • 2024" data-image="album2.jpg" data-audio="" data-duration="2:45" data-date="2024">
-                    <div class="artwork-wrapper"><img src="album2.jpg" alt=""></div>
-                    <div class="track-title">Sweet Boy</div>
-                    <div class="track-artist">Malcolm Todd</div>
+                <div class="card" data-album="Dauntless Manifesto" data-artist="Cupcakke" data-genre="Hip-Hop • 2026" data-image="Dauntless Manifesto/cover.jpg" data-audio="Dauntless Manifesto/Dauntless Manifesto.mp3" data-duration="2:45" data-date="2026">
+                    <div class="artwork-wrapper"><img src="Dauntless Manifesto/cover.jpg" alt=""></div>
+                    <div class="track-title">Dauntless Manifesto</div>
+                    <div class="track-artist">Cupcakke</div>
                 </div>
             </section>
         </div>
@@ -614,6 +644,11 @@
                     <div class="artwork-wrapper"><img src="ulteriormotives.jpg" alt=""></div>
                     <div class="track-title">Ulterior Motives</div>
                     <div class="track-artist">Who's Who</div>
+                </div>
+                <div class="card" data-album="Dauntless Manifesto" data-artist="Cupcakke" data-genre="Hip-Hop • 2026" data-image="Dauntless Manifesto/cover.jpg" data-audio="Dauntless Manifesto/Dauntless Manifesto.mp3" data-duration="2:45" data-date="2026">
+                    <div class="artwork-wrapper"><img src="Dauntless Manifesto/cover.jpg" alt=""></div>
+                    <div class="track-title">Dauntless Manifesto</div>
+                    <div class="track-artist">Cupcakke</div>
                 </div>
             </div>
         </div>
@@ -695,8 +730,8 @@
             </div>
 
             <div class="fs-progress-container">
-                <div class="fs-progress-bar">
-                    <div class="fs-progress-fill" id="fs-progress-fill-indicator"></div>
+                <div class="fs-scrub-wrapper">
+                    <input type="range" id="fs-progress-slider" class="fs-progress-slider" min="0" max="100" value="0" step="0.1">
                 </div>
                 <div class="fs-time-row">
                     <span id="fs-time-current">0:00</span>
@@ -724,11 +759,12 @@
         let previousViewId = 'view-recently-added';
         let currentlyLoadedAudioUrl = '';
         let targetDurationString = '3:33';
+        let isSeekingTrackTimeline = false; // Prevents conflicts while scrubbing slider
 
         const audioEngine = document.getElementById('audio-engine');
         const playerPlayIcon = document.getElementById('player-play-icon');
         const fsPlayIcon = document.getElementById('fs-play-icon');
-        const fsProgressFill = document.getElementById('fs-progress-fill-indicator');
+        const fsProgressSlider = document.getElementById('fs-progress-slider');
         const fsTimeCurrent = document.getElementById('fs-time-current');
         const fsTimeTotal = document.getElementById('fs-time-total');
 
@@ -765,6 +801,7 @@
                 document.getElementById('fs-target-art').src = artSrc;
                 document.getElementById('fs-target-blur-bg').style.backgroundImage = `url('${artSrc}')`;
                 fsTimeTotal.innerText = `-${duration}`;
+                fsProgressSlider.value = 0;
             }
 
             if (audioEngine.paused) {
@@ -788,16 +825,55 @@
 
         // Live Audio Time Tracking Engine updates Progress bars
         audioEngine.addEventListener('timeupdate', () => {
-            if (!audioEngine.duration) return;
-            const pct = (audioEngine.currentTime / audioEngine.duration) * 100;
-            fsProgressFill.style.width = `${pct}%`;
+            if (!audioEngine.duration || isSeekingTrackTimeline) return;
             
-            // Format time readouts
+            const pct = (audioEngine.currentTime / audioEngine.duration) * 100;
+            fsProgressSlider.value = pct;
+            
+            // Format time readouts for current position
             let curMins = Math.floor(audioEngine.currentTime / 60);
             let curSecs = Math.floor(audioEngine.currentTime % 60);
             if (curSecs < 10) curSecs = '0' + curSecs;
             fsTimeCurrent.innerText = `${curMins}:${curSecs}`;
+
+            // Calculate active time remaining values countdown
+            let timeRemaining = audioEngine.duration - audioEngine.currentTime;
+            let remMins = Math.floor(timeRemaining / 60);
+            let remSecs = Math.floor(timeRemaining % 60);
+            if (remSecs < 10) remSecs = '0' + remSecs;
+            fsTimeTotal.innerText = `-${remMins}:${remSecs}`;
         });
+
+        // Set baseline values when media track fully loads metadata properties
+        audioEngine.addEventListener('loadedmetadata', () => {
+            if(!isSeekingTrackTimeline) {
+                let totMins = Math.floor(audioEngine.duration / 60);
+                let totSecs = Math.floor(audioEngine.duration % 60);
+                if (totSecs < 10) totSecs = '0' + totSecs;
+                fsTimeTotal.innerText = `-${totMins}:${totSecs}`;
+            }
+        });
+
+        /* --- Interactive Scrub Slider Event Handling Listeners --- */
+        fsProgressSlider.addEventListener('input', () => {
+            isSeekingTrackTimeline = true;
+            if (audioEngine.duration) {
+                const targetTime = (fsProgressSlider.value / 100) * audioEngine.duration;
+                let curMins = Math.floor(targetTime / 60);
+                let curSecs = Math.floor(targetTime % 60);
+                if (curSecs < 10) curSecs = '0' + curSecs;
+                fsTimeCurrent.innerText = `${curMins}:${curSecs}`;
+            }
+        });
+
+        fsProgressSlider.addEventListener('change', () => {
+            if (audioEngine.duration) {
+                const targetTime = (fsProgressSlider.value / 100) * audioEngine.duration;
+                audioEngine.currentTime = targetTime;
+            }
+            isSeekingTrackTimeline = false;
+        });
+
 
         // Intercept Album Card clicks
         document.querySelectorAll('.card[data-album]').forEach(card => {
