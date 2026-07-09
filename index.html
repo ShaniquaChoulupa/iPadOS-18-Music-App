@@ -494,7 +494,7 @@
             margin-bottom: 30px;
         }
 
-        /* --- Custom Draggable Scrub/Range Bar Slider Styles --- */
+        /* Draggable scrub timeline layout */
         .fs-scrub-wrapper {
             position: relative;
             width: 100%;
@@ -512,11 +512,8 @@
             background: rgba(255, 255, 255, 0.2);
             outline: none;
             cursor: pointer;
-            position: relative;
-            z-index: 5;
         }
 
-        /* Draggable circular thumb control mechanism */
         .fs-progress-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -530,13 +527,6 @@
 
         .fs-progress-slider:active::-webkit-slider-thumb {
             transform: scale(2.2);
-        }
-
-        /* Track alignment fallback styling constraints */
-        .fs-progress-slider::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
         }
 
         .fs-time-row {
@@ -624,15 +614,15 @@
             </header>
 
             <section class="grid">
-                <div class="card" data-album="Ulterior Motives" data-artist="Who's Who" data-genre="Pop • 2026 • Lossless" data-image="ulteriormotives.jpg" data-audio="ulteriormotives.mp3" data-duration="3:33" data-date="July 2026">
+                <div class="card" data-album-id="ulterior_motives">
                     <div class="artwork-wrapper"><img src="ulteriormotives.jpg" alt=""></div>
                     <div class="track-title">Ulterior Motives</div>
                     <div class="track-artist">Who's Who</div>
                 </div>
-                <div class="card" data-album="Dauntless Manifesto" data-artist="Cupcakke" data-genre="Hip-Hop • 2026" data-image="Dauntless Manifesto/cover.jpg" data-audio="Dauntless Manifesto/Dauntless Manifesto.mp3" data-duration="2:45" data-date="2026">
+                <div class="card" data-album-id="dauntless_manifesto">
                     <div class="artwork-wrapper"><img src="Dauntless Manifesto/cover.jpg" alt=""></div>
                     <div class="track-title">Dauntless Manifesto</div>
-                    <div class="track-artist">Cupcakke</div>
+                    <div class="track-artist">Cupcake</div>
                 </div>
             </section>
         </div>
@@ -640,15 +630,15 @@
         <div id="view-albums" class="view-panel">
             <header class="main-header"><h1 class="main-title">Albums</h1></header>
             <div class="grid" style="margin-top:15px;">
-                <div class="card" data-album="Ulterior Motives" data-artist="Who's Who" data-genre="Pop • 2026 • Lossless" data-image="ulteriormotives.jpg" data-audio="ulteriormotives.mp3" data-duration="3:33" data-date="July 2026">
+                <div class="card" data-album-id="ulterior_motives">
                     <div class="artwork-wrapper"><img src="ulteriormotives.jpg" alt=""></div>
                     <div class="track-title">Ulterior Motives</div>
                     <div class="track-artist">Who's Who</div>
                 </div>
-                <div class="card" data-album="Dauntless Manifesto" data-artist="Cupcakke" data-genre="Hip-Hop • 2026" data-image="Dauntless Manifesto/cover.jpg" data-audio="Dauntless Manifesto/Dauntless Manifesto.mp3" data-duration="2:45" data-date="2026">
+                <div class="card" data-album-id="dauntless_manifesto">
                     <div class="artwork-wrapper"><img src="Dauntless Manifesto/cover.jpg" alt=""></div>
                     <div class="track-title">Dauntless Manifesto</div>
-                    <div class="track-artist">Cupcakke</div>
+                    <div class="track-artist">Cupcake</div>
                 </div>
             </div>
         </div>
@@ -660,12 +650,12 @@
 
             <div class="detail-hero-section">
                 <div class="detail-large-artwork">
-                    <img id="detail-target-art" src="ulteriormotives.jpg" alt="">
+                    <img id="detail-target-art" src="" alt="">
                 </div>
                 <div class="detail-metadata-box">
-                    <h2 class="detail-album-title" id="detail-target-title">Ulterior Motives</h2>
-                    <h3 class="detail-artist-name" id="detail-target-artist">Who's Who</h3>
-                    <div class="detail-sub-tags" id="detail-target-genre">Pop • 2026 • Lossless</div>
+                    <h2 class="detail-album-title" id="detail-target-title"></h2>
+                    <h3 class="detail-artist-name" id="detail-target-artist"></h3>
+                    <div class="detail-sub-tags" id="detail-target-genre"></div>
                     
                     <div class="detail-action-row">
                         <button class="action-pill-btn" id="btn-hero-play">
@@ -680,18 +670,11 @@
                 </div>
             </div>
 
-            <div class="tracklist-container">
-                <div class="track-row" id="detail-track-row-trigger">
-                    <span class="track-number">1</span>
-                    <span class="track-name-main" id="detail-target-track-name">Ulterior Motives</span>
-                    <span class="track-duration" id="detail-target-duration">3:33</span>
-                    <span class="track-row-options">•••</span>
-                </div>
-            </div>
+            <div class="tracklist-container" id="detail-tracklist-rows"></div>
 
             <div class="detail-legal-footer">
-                <span id="detail-target-footer-date">July 2026</span><br>
-                1 song, <span id="detail-target-footer-summary">3 minutes, 33 seconds</span><br>
+                <span id="detail-target-footer-date"></span><br>
+                <span id="detail-target-footer-summary"></span><br>
                 ℗ 2026 Music Clone Inc.
             </div>
         </div>
@@ -756,10 +739,39 @@
     </div>
 
     <script>
+        // Multi-Track Album Database System
+        const albumDatabase = {
+            ulterior_motives: {
+                title: "Ulterior Motives",
+                artist: "Who's Who",
+                genre: "Pop • 2026 • Lossless",
+                image: "ulteriormotives.jpg",
+                date: "July 2026",
+                summary: "1 song, 3 minutes, 33 seconds",
+                tracks: [
+                    { name: "Ulterior Motives", audio: "ulteriormotives.mp3", duration: "3:33" }
+                ]
+            },
+            dauntless_manifesto: {
+                title: "Dauntless Manifesto",
+                artist: "Cupcake",
+                genre: "Hip-Hop • 2026",
+                image: "Dauntless Manifesto/cover.jpg",
+                date: "2026",
+                summary: "1 song, 2 minutes, 45 seconds", // Adjust total summary text as you add tracks
+                tracks: [
+                    // Looks inside the Dauntless Manifesto folder
+                    { name: "Dauntless Manifesto", audio: "Dauntless Manifesto/Dauntless Manifesto.mp3", duration: "2:45" }
+                    // You can copy/paste and add more tracks from the folder below:
+                    // { name: "Track Two Name", audio: "Dauntless Manifesto/track2.mp3", duration: "3:12" }
+                ]
+            }
+        };
+
         let previousViewId = 'view-recently-added';
         let currentlyLoadedAudioUrl = '';
         let targetDurationString = '3:33';
-        let isSeekingTrackTimeline = false; // Prevents conflicts while scrubbing slider
+        let isSeekingTrackTimeline = false;
 
         const audioEngine = document.getElementById('audio-engine');
         const playerPlayIcon = document.getElementById('player-play-icon');
@@ -805,7 +817,7 @@
             }
 
             if (audioEngine.paused) {
-                audioEngine.play().catch(e => console.log("Audio pipeline loaded. Ready to stream: " + audioFile));
+                audioEngine.play().catch(e => console.log("Streaming error or folder asset not found: " + audioFile));
                 setPlayStateIcons(true);
             } else {
                 audioEngine.pause();
@@ -830,13 +842,13 @@
             const pct = (audioEngine.currentTime / audioEngine.duration) * 100;
             fsProgressSlider.value = pct;
             
-            // Format time readouts for current position
+            // Format time readouts
             let curMins = Math.floor(audioEngine.currentTime / 60);
             let curSecs = Math.floor(audioEngine.currentTime % 60);
             if (curSecs < 10) curSecs = '0' + curSecs;
             fsTimeCurrent.innerText = `${curMins}:${curSecs}`;
 
-            // Calculate active time remaining values countdown
+            // Remaining tracking calculation
             let timeRemaining = audioEngine.duration - audioEngine.currentTime;
             let remMins = Math.floor(timeRemaining / 60);
             let remSecs = Math.floor(timeRemaining % 60);
@@ -844,17 +856,7 @@
             fsTimeTotal.innerText = `-${remMins}:${remSecs}`;
         });
 
-        // Set baseline values when media track fully loads metadata properties
-        audioEngine.addEventListener('loadedmetadata', () => {
-            if(!isSeekingTrackTimeline) {
-                let totMins = Math.floor(audioEngine.duration / 60);
-                let totSecs = Math.floor(audioEngine.duration % 60);
-                if (totSecs < 10) totSecs = '0' + totSecs;
-                fsTimeTotal.innerText = `-${totMins}:${totSecs}`;
-            }
-        });
-
-        /* --- Interactive Scrub Slider Event Handling Listeners --- */
+        // Scrub Slider Event Handlers
         fsProgressSlider.addEventListener('input', () => {
             isSeekingTrackTimeline = true;
             if (audioEngine.duration) {
@@ -874,30 +876,43 @@
             isSeekingTrackTimeline = false;
         });
 
-
-        // Intercept Album Card clicks
-        document.querySelectorAll('.card[data-album]').forEach(card => {
+        // Dynamic multi-track album viewer rendering system
+        document.querySelectorAll('.card[data-album-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const title = card.getAttribute('data-album');
-                const artist = card.getAttribute('data-artist');
-                const genre = card.getAttribute('data-genre');
-                const img = card.getAttribute('data-image');
-                const audio = card.getAttribute('data-audio');
-                const duration = card.getAttribute('data-duration');
-                const footerDate = card.getAttribute('data-date');
+                const albumId = card.getAttribute('data-album-id');
+                const album = albumDatabase[albumId];
+                if (!album) return;
 
-                document.getElementById('detail-target-title').innerText = title;
-                document.getElementById('detail-target-artist').innerText = artist;
-                document.getElementById('detail-target-genre').innerText = genre;
-                document.getElementById('detail-target-art').src = img;
-                document.getElementById('detail-target-track-name').innerText = title;
-                document.getElementById('detail-target-duration').innerText = duration;
-                document.getElementById('detail-target-footer-date').innerText = footerDate;
-                document.getElementById('detail-target-footer-summary').innerText = duration.replace(":", " minutes, ") + " seconds";
+                document.getElementById('detail-target-title').innerText = album.title;
+                document.getElementById('detail-target-artist').innerText = album.artist;
+                document.getElementById('detail-target-genre').innerText = album.genre;
+                document.getElementById('detail-target-art').src = album.image;
+                document.getElementById('detail-target-footer-date').innerText = album.date;
+                document.getElementById('detail-target-footer-summary').innerText = album.summary;
 
-                // Setup live play trigger buttons inside details panel context
-                document.getElementById('detail-track-row-trigger').onclick = () => playTrack(audio, title, artist, img, duration);
-                document.getElementById('btn-hero-play').onclick = () => playTrack(audio, title, artist, img, duration);
+                // Loop and list every track in the folder profile dynamically
+                const tracklistRowsContainer = document.getElementById('detail-tracklist-rows');
+                tracklistRowsContainer.innerHTML = '';
+
+                album.tracks.forEach((track, index) => {
+                    const trackRow = document.createElement('div');
+                    trackRow.className = 'track-row';
+                    trackRow.innerHTML = `
+                        <span class="track-number">${index + 1}</span>
+                        <span class="track-name-main">${track.name}</span>
+                        <span class="track-duration">${track.duration}</span>
+                        <span class="track-row-options">•••</span>
+                    `;
+                    trackRow.onclick = () => playTrack(track.audio, track.name, album.artist, album.image, track.duration);
+                    tracklistRowsContainer.appendChild(trackRow);
+                });
+
+                // Set main play button to play first track
+                if (album.tracks.length > 0) {
+                    document.getElementById('btn-hero-play').onclick = () => {
+                        playTrack(album.tracks[0].audio, album.tracks[0].name, album.artist, album.image, album.tracks[0].duration);
+                    };
+                }
 
                 document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active-view'));
                 document.getElementById('view-album-detail').classList.add('active-view');
@@ -906,7 +921,7 @@
 
         // Toggle Buttons Listeners
         document.getElementById('player-toggle-play-btn').addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop click expanding window framework
+            e.stopPropagation();
             if (currentlyLoadedAudioUrl) playTrack(currentlyLoadedAudioUrl, "", "", "", targetDurationString);
         });
 
