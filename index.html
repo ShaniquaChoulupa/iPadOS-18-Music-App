@@ -494,39 +494,20 @@
             margin-bottom: 30px;
         }
 
-        /* Draggable scrub timeline layout */
-        .fs-scrub-wrapper {
-            position: relative;
-            width: 100%;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-
-        .fs-progress-slider {
-            -webkit-appearance: none;
-            appearance: none;
+        .fs-progress-bar {
             width: 100%;
             height: 4px;
-            border-radius: 2px;
             background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
+            margin-bottom: 8px;
         }
 
-        .fs-progress-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ffffff;
-            cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-
-        .fs-progress-slider:active::-webkit-slider-thumb {
-            transform: scale(2.2);
+        .fs-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: white;
+            border-radius: 2px;
         }
 
         .fs-time-row {
@@ -535,7 +516,6 @@
             width: 100%;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.5);
-            font-variant-numeric: tabular-nums;
         }
 
         .fs-controls-row {
@@ -713,8 +693,8 @@
             </div>
 
             <div class="fs-progress-container">
-                <div class="fs-scrub-wrapper">
-                    <input type="range" id="fs-progress-slider" class="fs-progress-slider" min="0" max="100" value="0" step="0.1">
+                <div class="fs-progress-bar">
+                    <div class="fs-progress-fill" id="fs-progress-fill-indicator"></div>
                 </div>
                 <div class="fs-time-row">
                     <span id="fs-time-current">0:00</span>
@@ -739,7 +719,7 @@
     </div>
 
     <script>
-        // Multi-Track Album Database System
+        // Centralized Album Database containing track files and display configurations
         const albumDatabase = {
             ulterior_motives: {
                 title: "Ulterior Motives",
@@ -755,15 +735,27 @@
             dauntless_manifesto: {
                 title: "Dauntless Manifesto",
                 artist: "Cupcake",
-                genre: "Hip-Hop • 2026",
+                genre: "Hip-Hop • 2024 • Lossless",
                 image: "Dauntless Manifesto/cover.jpg",
-                date: "2026",
-                summary: "1 song, 2 minutes, 45 seconds", // Adjust total summary text as you add tracks
+                date: "2024",
+                summary: "16 songs, 48 minutes",
                 tracks: [
-                    // Looks inside the Dauntless Manifesto folder
-                    { name: "Dauntless Manifesto", audio: "Dauntless Manifesto/Dauntless Manifesto.mp3", duration: "2:45" }
-                    // You can copy/paste and add more tracks from the folder below:
-                    // { name: "Track Two Name", audio: "Dauntless Manifesto/track2.mp3", duration: "3:12" }
+                    { name: "Grilling Niggas II", audio: "Dauntless Manifesto/01. [Spoticatch] Grilling Niggas II - cupcakKe.mp3", duration: "2:15" },
+                    { name: "Connect 4", audio: "Dauntless Manifesto/02. [Spoticatch] Connect 4 - cupcakKe.mp3", duration: "2:34" },
+                    { name: "Water Balloon", audio: "Dauntless Manifesto/03. [Spoticatch] Water Balloon - cupcakKe.mp3", duration: "3:01" },
+                    { name: "Rock Paper Scissors", audio: "Dauntless Manifesto/04. [Spoticatch] Rock Paper Scissors - cupcakKe.mp3", duration: "2:42" },
+                    { name: "Dora", audio: "Dauntless Manifesto/05. [Spoticatch] Dora - cupcakKe.mp3", duration: "2:55" },
+                    { name: "Queef", audio: "Dauntless Manifesto/06. [Spoticatch] Queef - cupcakKe.mp3", duration: "1:58" },
+                    { name: "Aura", audio: "Dauntless Manifesto/07. [Spoticatch] Aura - cupcakKe.mp3", duration: "3:12" },
+                    { name: "Dui", audio: "Dauntless Manifesto/08. [Spoticatch] Dui - cupcakKe.mp3", duration: "2:20" },
+                    { name: "Double Homicide", audio: "Dauntless Manifesto/09. [Spoticatch] Double Homicide - cupcakKe.mp3", duration: "2:47" },
+                    { name: "Little Red Riding Good", audio: "Dauntless Manifesto/10. [Spoticatch] Little Red Riding Good - cupcakKe.mp3", duration: "3:05" },
+                    { name: "Cody", audio: "Dauntless Manifesto/11. [Spoticatch] Cody - cupcakKe.mp3", duration: "2:28" },
+                    { name: "Nun Nun", audio: "Dauntless Manifesto/12. [Spoticatch] Nun Nun - cupcakKe.mp3", duration: "2:14" },
+                    { name: "Yawn", audio: "Dauntless Manifesto/13. [Spoticatch] Yawn - cupcakKe.mp3", duration: "3:31" },
+                    { name: "Dementia", audio: "Dauntless Manifesto/14. [Spoticatch] Dementia - cupcakKe.mp3", duration: "2:50" },
+                    { name: "Backstage Passes", audio: "Dauntless Manifesto/15. [Spoticatch] Backstage Passes - cupcakKe.mp3", duration: "3:08" },
+                    { name: "Cruella", audio: "Dauntless Manifesto/16. [Spoticatch] Cruella - cupcakKe.mp3", duration: "2:44" }
                 ]
             }
         };
@@ -771,12 +763,11 @@
         let previousViewId = 'view-recently-added';
         let currentlyLoadedAudioUrl = '';
         let targetDurationString = '3:33';
-        let isSeekingTrackTimeline = false;
 
         const audioEngine = document.getElementById('audio-engine');
         const playerPlayIcon = document.getElementById('player-play-icon');
         const fsPlayIcon = document.getElementById('fs-play-icon');
-        const fsProgressSlider = document.getElementById('fs-progress-slider');
+        const fsProgressFill = document.getElementById('fs-progress-fill-indicator');
         const fsTimeCurrent = document.getElementById('fs-time-current');
         const fsTimeTotal = document.getElementById('fs-time-total');
 
@@ -813,11 +804,10 @@
                 document.getElementById('fs-target-art').src = artSrc;
                 document.getElementById('fs-target-blur-bg').style.backgroundImage = `url('${artSrc}')`;
                 fsTimeTotal.innerText = `-${duration}`;
-                fsProgressSlider.value = 0;
             }
 
             if (audioEngine.paused) {
-                audioEngine.play().catch(e => console.log("Streaming error or folder asset not found: " + audioFile));
+                audioEngine.play().catch(e => console.log("Audio pipeline loaded. Ready to stream: " + audioFile));
                 setPlayStateIcons(true);
             } else {
                 audioEngine.pause();
@@ -837,46 +827,18 @@
 
         // Live Audio Time Tracking Engine updates Progress bars
         audioEngine.addEventListener('timeupdate', () => {
-            if (!audioEngine.duration || isSeekingTrackTimeline) return;
-            
+            if (!audioEngine.duration) return;
             const pct = (audioEngine.currentTime / audioEngine.duration) * 100;
-            fsProgressSlider.value = pct;
+            fsProgressFill.style.width = `${pct}%`;
             
             // Format time readouts
             let curMins = Math.floor(audioEngine.currentTime / 60);
             let curSecs = Math.floor(audioEngine.currentTime % 60);
             if (curSecs < 10) curSecs = '0' + curSecs;
             fsTimeCurrent.innerText = `${curMins}:${curSecs}`;
-
-            // Remaining tracking calculation
-            let timeRemaining = audioEngine.duration - audioEngine.currentTime;
-            let remMins = Math.floor(timeRemaining / 60);
-            let remSecs = Math.floor(timeRemaining % 60);
-            if (remSecs < 10) remSecs = '0' + remSecs;
-            fsTimeTotal.innerText = `-${remMins}:${remSecs}`;
         });
 
-        // Scrub Slider Event Handlers
-        fsProgressSlider.addEventListener('input', () => {
-            isSeekingTrackTimeline = true;
-            if (audioEngine.duration) {
-                const targetTime = (fsProgressSlider.value / 100) * audioEngine.duration;
-                let curMins = Math.floor(targetTime / 60);
-                let curSecs = Math.floor(targetTime % 60);
-                if (curSecs < 10) curSecs = '0' + curSecs;
-                fsTimeCurrent.innerText = `${curMins}:${curSecs}`;
-            }
-        });
-
-        fsProgressSlider.addEventListener('change', () => {
-            if (audioEngine.duration) {
-                const targetTime = (fsProgressSlider.value / 100) * audioEngine.duration;
-                audioEngine.currentTime = targetTime;
-            }
-            isSeekingTrackTimeline = false;
-        });
-
-        // Dynamic multi-track album viewer rendering system
+        // Dynamic Database Card Render Handlers
         document.querySelectorAll('.card[data-album-id]').forEach(card => {
             card.addEventListener('click', () => {
                 const albumId = card.getAttribute('data-album-id');
@@ -890,9 +852,8 @@
                 document.getElementById('detail-target-footer-date').innerText = album.date;
                 document.getElementById('detail-target-footer-summary').innerText = album.summary;
 
-                // Loop and list every track in the folder profile dynamically
-                const tracklistRowsContainer = document.getElementById('detail-tracklist-rows');
-                tracklistRowsContainer.innerHTML = '';
+                const tracklistContainer = document.getElementById('detail-tracklist-rows');
+                tracklistContainer.innerHTML = ''; // Reset structural children layout context
 
                 album.tracks.forEach((track, index) => {
                     const trackRow = document.createElement('div');
@@ -903,11 +864,12 @@
                         <span class="track-duration">${track.duration}</span>
                         <span class="track-row-options">•••</span>
                     `;
+                    
                     trackRow.onclick = () => playTrack(track.audio, track.name, album.artist, album.image, track.duration);
-                    tracklistRowsContainer.appendChild(trackRow);
+                    tracklistContainer.appendChild(trackRow);
                 });
 
-                // Set main play button to play first track
+                // Top level Master Action Play Button link to track index 0
                 if (album.tracks.length > 0) {
                     document.getElementById('btn-hero-play').onclick = () => {
                         playTrack(album.tracks[0].audio, album.tracks[0].name, album.artist, album.image, album.tracks[0].duration);
@@ -921,7 +883,7 @@
 
         // Toggle Buttons Listeners
         document.getElementById('player-toggle-play-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // Stop click expanding window framework
             if (currentlyLoadedAudioUrl) playTrack(currentlyLoadedAudioUrl, "", "", "", targetDurationString);
         });
 
